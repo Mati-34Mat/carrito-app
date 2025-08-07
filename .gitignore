@@ -1,0 +1,31 @@
+# Node
+node_modules/
+.env
+dist/
+build/
+*.log
+
+# Prisma
+/prisma/dev.db
+/prisma/dev.db-journal
+/generated/
+
+# Vite
+.vite/
+.cache/
+
+# Editor / Sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# VSCode
+.vscode/
+
+# Windows
+ehthumbs.db
+desktop.ini
+
+# Linux
+*.pid
