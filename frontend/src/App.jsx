@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import ProductForm from "./components/ProductForm";
+import ProductAdd from "./components/ProductAdd";
+import ProductUpdate from "./components/ProductUpdate";
 import ProductList from "./components/ProductList";
+import "tailwindcss";
 
 function App() {
   const [productos, setProductos] = useState([]);
@@ -21,11 +23,12 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
+    <div className="min-h-screen bg-emerald-200 p-6">
+      <h1 className="text-6xl font-extrabold text-center text-gray-900 mb-12">
         Carrito de Compras
       </h1>
-      <ProductForm onSuccess={fetchProductos} />
+      <ProductAdd onSuccess={fetchProductos} />
+      <ProductUpdate onSuccess={fetchProductos} />
       <ProductList productos={productos} onRefresh={fetchProductos} />
     </div>
   );

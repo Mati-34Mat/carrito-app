@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function ProductForm({ onSuccess }) {
+export default function ProductAdd({ onSuccess }) {
   const [form, setForm] = useState({
     codigo: "",
     nombre: "",
@@ -47,7 +47,7 @@ export default function ProductForm({ onSuccess }) {
       onSubmit={handleSubmit}
       className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto mb-8"
     >
-      <h2 className="text-2xl font-semibold mb-4 text-gray-700">
+      <h2 className="text-3xl font-semibold mb-4 text-gray-700 text-center">
         Agregar Producto
       </h2>
       <div className="grid grid-cols-1 gap-3">
@@ -66,7 +66,7 @@ export default function ProductForm({ onSuccess }) {
         )}
         <button
           type="submit"
-          className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors mt-2"
+          className="bg-purple-700 text-white py-2 rounded hover:bg-purple-900 transition-colors mt-2"
         >
           Agregar
         </button>
