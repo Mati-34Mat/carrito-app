@@ -1,35 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import ProductList from "./ProductList";
+import ProductForm from "./ProductForm";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [productos, setProductos] = useState([]);
+
+  const fetchProductos = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/products");
+      const data = await res.json();
+      setProductos(data);
+    } catch (err) {
+      console.error("Error al obtener productos", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductos();
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div style={{ padding: "20px" }}>
+      <h1>Carrito de compras - Productos</h1>
+      <ProductForm onSuccess={fetchProductos} />
+      <ProductList productos={productos} onRefresh={fetchProductos} />
+    </div>
+  );
 }
 
-export default App
+export default App;
