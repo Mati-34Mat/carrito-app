@@ -45,12 +45,12 @@ export default function AddForm({ onSuccess }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto mb-8"
+      className="bg-transparent p-1 rounded-lg shadow-md max-w-4xl mx-auto mb-8"
     >
-      <h2 className="text-3xl font-semibold mb-4 text-gray-700 text-center">
+      <h2 className="text-3xl font-serif font-semibold mb-4 text-orange-300 text-center">
         Agregar Producto
       </h2>
-      <div className="grid grid-cols-1 gap-3">
+      <div className="font-serif text-black grid grid-cols-1 gap-3">
         {["codigo", "nombre", "descripcion", "precio", "stock", "categoria", "imagenes"].map(
           (field) => (
             <input
@@ -59,14 +59,14 @@ export default function AddForm({ onSuccess }) {
               placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
               value={form[field]}
               onChange={handleChange}
-              className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="border border-white bg-white/90 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               required={["codigo", "nombre", "precio", "stock"].includes(field)}
             />
           )
         )}
         <button
           type="submit"
-          className="bg-purple-700 text-white py-2 rounded hover:bg-purple-900 transition-colors mt-2"
+          className="bg-orange-800 font-serif text-white py-2 rounded hover:bg-orange-900 transition-colors mt-2"
         >
           Agregar
         </button>

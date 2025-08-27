@@ -16,7 +16,7 @@ export default function ProductList({ productos = [], onRefresh }) {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-700">Lista de Productos</h2>
+      <h2 className="font-serif text-2xl font-semibold mb-4 text-orange-300">Lista de Productos</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {productos.map((p) => (
           <div
@@ -31,7 +31,7 @@ export default function ProductList({ productos = [], onRefresh }) {
               />
             )}
             <div>
-              <h3 className="font-semibold text-lg text-gray-800">{p.nombre}</h3>
+              <h3 className="font-serif font-semibold text-lg text-gray-800">{p.nombre}</h3>
               <p className="text-gray-600">{p.descripcion}</p>
               <p className="text-gray-500">Código: {p.codigo}</p>
               <p className="mt-2 text-gray-700">
