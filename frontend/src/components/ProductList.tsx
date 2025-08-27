@@ -1,7 +1,23 @@
 import React from "react";
 
-export default function ProductList({ productos = [], onRefresh }) {
-  const bloquearProducto = async (id) => {
+interface Producto {
+  id: number;
+  codigo: string;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  stock: number;
+  categoria: string;
+  imagenes?: string;
+}
+
+interface ProductListProps {
+  productos?: Producto[];
+  onRefresh: () => void;
+}
+
+export default function ProductList({ productos = [], onRefresh }: ProductListProps) {
+  const bloquearProducto = async (id: number) => {
     try {
       await fetch(`http://localhost:3000/products/bloquear/${id}`, {
         method: "PATCH",
@@ -16,7 +32,7 @@ export default function ProductList({ productos = [], onRefresh }) {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <h2 className="font-serif text-2xl font-semibold mb-4 text-orange-500 text-4xl">Lista de Productos</h2>
+      <h2 className="font-serif text-4xl font-semibold mb-4 text-orange-500">Lista de Productos</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {productos.map((p) => (
           <div

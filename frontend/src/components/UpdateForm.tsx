@@ -1,7 +1,30 @@
 import React, { useState } from "react";
 
-export default function UpdateForm({ onSuccess }) {
-  const [form, setForm] = useState({
+interface FormData {
+  codigo: string;
+  nombre: string;
+  descripcion: string;
+  precio: string;
+  stock: string;
+  categoria: string;
+  imagenes: string;
+}
+
+type UpdateData = Partial<{
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  stock: number;
+  categoria: string;
+  imagenes: string;
+}>;
+
+interface UpdateFormProps {
+  onSuccess: () => void;
+}
+
+export default function UpdateForm({ onSuccess }: UpdateFormProps) {
+  const [form, setForm] = useState<FormData>({
     codigo: "",
     nombre: "",
     descripcion: "",
@@ -11,11 +34,11 @@ export default function UpdateForm({ onSuccess }) {
     imagenes: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!form.codigo) {
@@ -24,6 +47,7 @@ export default function UpdateForm({ onSuccess }) {
     }
 
     try {
+      // Obtener ID del producto según código
       const resGet = await fetch(`http://localhost:3000/products?codigo=${form.codigo}`);
       if (!resGet.ok) throw new Error("Error al buscar producto por código");
       const data = await resGet.json();
@@ -35,12 +59,15 @@ export default function UpdateForm({ onSuccess }) {
 
       const productoId = data[0].id;
 
-      const dataToUpdate = {};
-      Object.keys(form).forEach((key) => {
-        if (key !== "codigo" && form[key] !== "") {
-          if (key === "precio") dataToUpdate[key] = parseFloat(form[key]);
-          else if (key === "stock") dataToUpdate[key] = parseInt(form[key]);
-          else dataToUpdate[key] = form[key];
+      // Preparar datos para actualizar solo con campos llenos
+      const dataToUpdate: UpdateData = {};
+      (Object.keys(form) as Array<keyof FormData>).forEach((key) => {
+        if (key === "codigo") return;
+        const value = form[key];
+        if (value !== "") {
+          if (key === "precio") dataToUpdate[key] = parseFloat(value);
+          else if (key === "stock") dataToUpdate[key] = parseInt(value);
+          else dataToUpdate[key] = value;
         }
       });
 
@@ -50,6 +77,7 @@ export default function UpdateForm({ onSuccess }) {
         body: JSON.stringify(dataToUpdate),
       });
 
+      // Resetear formulario
       setForm({
         codigo: "",
         nombre: "",
@@ -82,7 +110,7 @@ export default function UpdateForm({ onSuccess }) {
               key={field}
               name={field}
               placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-              value={form[field]}
+              value={form[field as keyof FormData]}
               onChange={handleChange}
               className="border border-white bg-white/90 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               required={field === "codigo"} // solo el código obligatorio
