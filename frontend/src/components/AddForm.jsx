@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function ProductUpdate({ onSuccess }) {
+export default function AddForm({ onSuccess }) {
   const [form, setForm] = useState({
     codigo: "",
     nombre: "",
@@ -18,8 +18,8 @@ export default function ProductUpdate({ onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch("http://localhost:3000/products/${id}", {
-        method: "PUT",
+      await fetch("http://localhost:3000/products", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
@@ -38,7 +38,7 @@ export default function ProductUpdate({ onSuccess }) {
       });
       onSuccess();
     } catch (err) {
-      console.error("Error al actualizar producto", err);
+      console.error("Error al crear producto", err);
     }
   };
 
@@ -48,7 +48,7 @@ export default function ProductUpdate({ onSuccess }) {
       className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto mb-8"
     >
       <h2 className="text-3xl font-semibold mb-4 text-gray-700 text-center">
-        Actualizar Producto
+        Agregar Producto
       </h2>
       <div className="grid grid-cols-1 gap-3">
         {["codigo", "nombre", "descripcion", "precio", "stock", "categoria", "imagenes"].map(

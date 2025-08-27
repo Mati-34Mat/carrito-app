@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import ProductAdd from "./components/ProductAdd";
-import ProductUpdate from "./components/ProductUpdate";
+import AddForm from "./components/AddForm";
+import UpdateForm from "./components/UpdateForm";
 import ProductList from "./components/ProductList";
 import "tailwindcss";
 
@@ -27,8 +27,8 @@ function App() {
       <h1 className="text-6xl font-extrabold text-center text-gray-900 mb-12">
         Carrito de Compras
       </h1>
-      <ProductAdd onSuccess={fetchProductos} />
-      <ProductUpdate onSuccess={fetchProductos} />
+      <AddForm onSuccess={fetchProductos} />
+      <UpdateForm onSuccess={fetchProductos} />
       <ProductList productos={productos} onRefresh={fetchProductos} />
     </div>
   );

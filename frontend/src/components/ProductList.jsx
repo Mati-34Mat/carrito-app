@@ -33,6 +33,7 @@ export default function ProductList({ productos = [], onRefresh }) {
             <div>
               <h3 className="font-semibold text-lg text-gray-800">{p.nombre}</h3>
               <p className="text-gray-600">{p.descripcion}</p>
+              <p className="text-gray-500">Código: {p.codigo}</p>
               <p className="mt-2 text-gray-700">
                 <span className="font-bold">Precio:</span> ${p.precio} |{" "}
                 <span className="font-bold">Stock:</span> {p.stock}
