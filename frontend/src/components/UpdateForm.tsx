@@ -23,7 +23,7 @@ interface UpdateFormProps {
   onSuccess: () => void;
 }
 
-export default function UpdateForm({ onSuccess }: UpdateFormProps) {
+export default function UpdateForm({ onSuccess }: Readonly<UpdateFormProps>) {
   const [form, setForm] = useState<FormData>({
     codigo: "",
     nombre: "",

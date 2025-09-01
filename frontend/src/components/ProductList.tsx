@@ -16,7 +16,7 @@ interface ProductListProps {
   onRefresh: () => void;
 }
 
-export default function ProductList({ productos = [], onRefresh }: ProductListProps) {
+export default function ProductList({ productos = [], onRefresh }: Readonly<ProductListProps>) {
   const bloquearProducto = async (id: number) => {
     try {
       await fetch(`http://localhost:3000/products/bloquear/${id}`, {
