@@ -33,7 +33,7 @@ export default function AddForm({ onSuccess }: Readonly<AddFormProps>) {
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		try {
-			await fetch("http://200.3.127.46:3000/products", {
+			await fetch("http://200.3.127.46:3001/products", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({

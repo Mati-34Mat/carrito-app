@@ -24,7 +24,7 @@ function App() {
 
 	const fetchProductos = async () => {
 		try {
-			const res = await fetch("http://200.3.127.46:3000/products");
+			const res = await fetch("http://200.3.127.46:3001/products");
 			if (!res.ok) throw new Error("Error al obtener productos");
 			const data: Producto[] = await res.json();
 			setProductos(data);

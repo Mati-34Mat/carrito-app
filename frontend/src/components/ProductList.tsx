@@ -22,7 +22,7 @@ export default function ProductList({
 }: Readonly<ProductListProps>) {
 	const bloquearProducto = async (id: number) => {
 		try {
-			await fetch(`http://200.3.127.46:3000/products/bloquear/${id}`, {
+			await fetch(`http://200.3.127.46:3001/products/bloquear/${id}`, {
 				method: "PATCH",
 			});
 			onRefresh();
