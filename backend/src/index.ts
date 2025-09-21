@@ -1,25 +1,23 @@
-import express, { Application, Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import pkg from '@prisma/client';
-import productosRouter from "./routes/products.js";
+import productosRouter from "./routes/products.ts"; // sin .ts
+import pkg from "@prisma/client";
 
 const { PrismaClient } = pkg;
+const prisma = new PrismaClient();
 dotenv.config();
 
-const app: Application = express();
-const prisma = new PrismaClient();
+const app = express();
+const PORT = Number(process.env.PORT) || 3001;
+const SERVER_IP = process.env.SERVER_IP || "0.0.0.0";
 
-const PORT: number = Number(process.env.PORT) || 3001;
-const SERVER_IP: string = process.env.SERVER_IP || '0.0.0.0';
-
-// Middlewares
 app.use(cors());
 app.use(express.json());
-app.use(express.static('src'));
+app.use(express.static("src"));
 
-// Rutas
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (_req: Request, res: Response) => {
   res.send("API Carrito funcionando");
 });
 

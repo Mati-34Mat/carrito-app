@@ -49,7 +49,7 @@ export default function UpdateForm({ onSuccess }: Readonly<UpdateFormProps>) {
 		try {
 			// Obtener ID del producto según código
 			const resGet = await fetch(
-				`http://200.3.127.46:3001/products?codigo=${form.codigo}`
+				`http://localhost:3001/products?codigo=${form.codigo}`
 			);
 			if (!resGet.ok) throw new Error("Error al buscar producto por código");
 			const data = await resGet.json();
@@ -73,7 +73,7 @@ export default function UpdateForm({ onSuccess }: Readonly<UpdateFormProps>) {
 				}
 			});
 
-			await fetch(`http://200.3.127.46:3001/products/${productoId}`, {
+			await fetch(`http://localhost:3001/products/${productoId}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(dataToUpdate),
