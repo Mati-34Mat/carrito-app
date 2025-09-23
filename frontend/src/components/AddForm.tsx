@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 
+const API_HOST = import.meta.env.VITE_API_HOST;
+const API_PORT = import.meta.env.VITE_API_PORT;
+
 interface ProductForm {
 	codigo: string;
 	nombre: string;
@@ -33,7 +36,7 @@ export default function AddForm({ onSuccess }: Readonly<AddFormProps>) {
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		try {
-			await fetch("http://localhost:3001/products", {
+			await fetch(`http://${API_HOST}:${API_PORT}/products`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({

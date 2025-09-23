@@ -6,9 +6,9 @@ build/
 *.log
 
 # Prisma
-/prisma/dev.db
-/prisma/dev.db-journal
-/generated/
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+backend/generated/
 
 # Vite
 .vite/

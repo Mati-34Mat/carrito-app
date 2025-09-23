@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 
+const API_HOST = import.meta.env.VITE_API_HOST;
+const API_PORT = import.meta.env.VITE_API_PORT;
+
 interface FormData {
 	codigo: string;
 	nombre: string;
@@ -49,7 +52,7 @@ export default function UpdateForm({ onSuccess }: Readonly<UpdateFormProps>) {
 		try {
 			// Obtener ID del producto según código
 			const resGet = await fetch(
-				`http://localhost:3001/products?codigo=${form.codigo}`
+				`http://${API_HOST}:${API_PORT}/products?codigo=${form.codigo}`
 			);
 			if (!resGet.ok) throw new Error("Error al buscar producto por código");
 			const data = await resGet.json();
@@ -73,7 +76,7 @@ export default function UpdateForm({ onSuccess }: Readonly<UpdateFormProps>) {
 				}
 			});
 
-			await fetch(`http://localhost:3001/products/${productoId}`, {
+			await fetch(`http://${API_HOST}:${API_PORT}/products/${productoId}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(dataToUpdate),

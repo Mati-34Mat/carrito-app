@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AddForm from "./components/AddForm";
 import UpdateForm from "./components/UpdateForm";
 import ProductList from "./components/ProductList";
@@ -15,6 +15,8 @@ interface Producto {
 }
 
 type ActiveComponent = "list" | "add" | "update";
+const API_HOST = import.meta.env.VITE_API_HOST;
+const API_PORT = import.meta.env.VITE_API_PORT;
 
 function App() {
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -24,7 +26,7 @@ function App() {
 
   const fetchProductos = async () => {
     try {
-      const res = await fetch("http://localhost:3001/products");
+      const res = await fetch(`http://${API_HOST}:${API_PORT}/products`);
       if (!res.ok) throw new Error("Error al obtener productos");
       const data: Producto[] = await res.json();
       setProductos(data);
