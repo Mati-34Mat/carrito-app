@@ -26,27 +26,47 @@ export default function AddForm({ onSuccess }: Readonly<AddFormProps>) {
     categoria: "",
   });
   const [imagen, setImagen] = useState<File | null>(null);
-  const [, setPreview] = useState<string>("");
+  const [preview, setPreview] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name as keyof ProductForm;
     setForm({ ...form, [name]: e.target.value });
+    setError("");
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validar tamaño (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError("La imagen no debe superar los 5MB");
+        return;
+      }
+      
+      // Validar tipo
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        setError("Solo se permiten imágenes (JPEG, PNG, GIF, WEBP)");
+        return;
+      }
+      
       setImagen(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+      setError("");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
     try {
       const formData = new FormData();
       formData.append("codigo", form.codigo);
@@ -59,11 +79,17 @@ export default function AddForm({ onSuccess }: Readonly<AddFormProps>) {
         formData.append("imagen", imagen);
       }
 
-      await fetch(`http://${API_HOST}:${API_PORT}/products`, {
+      const response = await fetch(`http://${API_HOST}:${API_PORT}/products`, {
         method: "POST",
         body: formData,
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Error al crear el producto");
+      }
+
+      // Limpiar formulario
       setForm({
         codigo: "",
         nombre: "",
@@ -76,7 +102,9 @@ export default function AddForm({ onSuccess }: Readonly<AddFormProps>) {
       setPreview("");
       onSuccess();
     } catch (err) {
-      console.error("Error al crear producto", err);
+      setError(err instanceof Error ? err.message : "Error al crear producto");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -88,6 +116,13 @@ export default function AddForm({ onSuccess }: Readonly<AddFormProps>) {
       <h2 className="text-3xl font-serif font-semibold mb-4 text-orange-300 text-center">
         Agregar Producto
       </h2>
+
+      {error && (
+        <div className="bg-red-500 text-white px-4 py-3 rounded mb-4 animate-pulse">
+          ⚠️ {error}
+        </div>
+      )}
+
       <div className="font-serif text-black grid grid-cols-1 gap-3">
         {(Object.keys(form) as Array<keyof ProductForm>).map((field) => (
           <input
@@ -98,30 +133,39 @@ export default function AddForm({ onSuccess }: Readonly<AddFormProps>) {
             onChange={handleChange}
             className="border border-white bg-white/90 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             required={["codigo", "nombre", "precio", "stock"].includes(field)}
+            type={field === "precio" || field === "stock" ? "number" : "text"}
+            step={field === "precio" ? "0.01" : undefined}
+            min={field === "precio" || field === "stock" ? "0" : undefined}
           />
         ))}
         
         <div className="bg-white/90 rounded p-3">
-					<label
-						htmlFor="imagen"
-						className="block text-sm font-medium mb-2"
-					>
-						Imagen del producto
-					</label>
-					<input
-						id="imagen"
-						type="file"
-						accept="image/*"
-						onChange={handleImageChange}
-						className="w-full"
-					/>
+          <label
+            htmlFor="imagen"
+            className="block text-sm font-medium mb-2"
+          >
+            Imagen del producto
+          </label>
+          <input
+            id="imagen"
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="w-full"
+          />
+          {preview && (
+            <div className="mt-2">
+              <img src={preview} alt="Preview" className="h-32 object-cover rounded" />
+            </div>
+          )}
         </div>
 
         <button
           type="submit"
-          className="bg-orange-800 font-serif text-white py-2 rounded hover:bg-orange-900 transition-colors mt-2"
+          disabled={isSubmitting}
+          className="bg-orange-800 font-serif text-white py-2 rounded hover:bg-orange-900 transition-colors mt-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Agregar
+          {isSubmitting ? "Agregando..." : "Agregar"}
         </button>
       </div>
     </form>

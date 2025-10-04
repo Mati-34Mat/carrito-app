@@ -12,16 +12,30 @@ router.post("/", upload.single("imagen"), async (req: Request, res: Response) =>
   const { codigo, nombre, descripcion, precio, stock, categoria } = req.body;
   
   try {
+    // Validar campos requeridos
+    if (!codigo || !nombre || !precio || !stock) {
+      return res.status(400).json({ error: "Campos requeridos: codigo, nombre, precio, stock" });
+    }
+
+    // Validar que el código no exista
+    const existente = await prisma.producto.findUnique({
+      where: { codigo },
+    });
+
+    if (existente) {
+      return res.status(400).json({ error: "Ya existe un producto con ese código" });
+    }
+
     const imagenUrl = req.file ? `/uploads/${req.file.filename}` : "";
     
     const producto = await prisma.producto.create({
       data: {
         codigo,
         nombre,
-        descripcion,
+        descripcion: descripcion || "",
         precio: parseFloat(precio),
         stock: parseInt(stock),
-        categoria,
+        categoria: categoria || "",
         imagenes: imagenUrl,
         bloqueado: false,
       },
@@ -29,7 +43,7 @@ router.post("/", upload.single("imagen"), async (req: Request, res: Response) =>
     res.json(producto);
   } catch (error: any) {
     console.error(error);
-    res.status(400).json({ error: "Error al crear producto" });
+    res.status(400).json({ error: error.message || "Error al crear producto" });
   }
 });
 
@@ -43,6 +57,19 @@ router.get("/", async (_req: Request, res: Response) => {
   } catch (error: any) {
     console.error(error);
     res.status(500).json({ error: "Error al obtener productos" });
+  }
+});
+
+// Obtener productos bloqueados
+router.get("/bloqueados", async (_req: Request, res: Response) => {
+  try {
+    const productos = await prisma.producto.findMany({ 
+      where: { bloqueado: true } 
+    });
+    res.json(productos);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ error: "Error al obtener productos bloqueados" });
   }
 });
 
@@ -69,14 +96,46 @@ router.put("/:id", upload.single("imagen"), async (req: Request, res: Response) 
   const { codigo, nombre, descripcion, precio, stock, categoria } = req.body;
   
   try {
+    // Verificar que el producto existe
+    const productoExistente = await prisma.producto.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!productoExistente) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    // Si se cambia el código, verificar que no exista otro producto con ese código
+    if (codigo && codigo !== productoExistente.codigo) {
+      const codigoExistente = await prisma.producto.findUnique({
+        where: { codigo },
+      });
+
+      if (codigoExistente) {
+        return res.status(400).json({ error: "Ya existe un producto con ese código" });
+      }
+    }
+
     const dataToUpdate: any = {};
     
     if (codigo) dataToUpdate.codigo = codigo;
     if (nombre) dataToUpdate.nombre = nombre;
-    if (descripcion) dataToUpdate.descripcion = descripcion;
-    if (precio) dataToUpdate.precio = parseFloat(precio);
-    if (stock) dataToUpdate.stock = parseInt(stock);
-    if (categoria) dataToUpdate.categoria = categoria;
+    if (descripcion !== undefined) dataToUpdate.descripcion = descripcion;
+    if (precio) {
+      const precioNum = parseFloat(precio);
+      if (isNaN(precioNum) || precioNum < 0) {
+        return res.status(400).json({ error: "Precio inválido" });
+      }
+      dataToUpdate.precio = precioNum;
+    }
+    if (stock) {
+      const stockNum = parseInt(stock);
+      if (isNaN(stockNum) || stockNum < 0) {
+        return res.status(400).json({ error: "Stock inválido" });
+      }
+      dataToUpdate.stock = stockNum;
+    }
+    if (categoria !== undefined) dataToUpdate.categoria = categoria;
     if (req.file) dataToUpdate.imagenes = `/uploads/${req.file.filename}`;
 
     const producto = await prisma.producto.update({
@@ -86,7 +145,7 @@ router.put("/:id", upload.single("imagen"), async (req: Request, res: Response) 
     res.json(producto);
   } catch (error: any) {
     console.error(error);
-    res.status(400).json({ error: "Error al editar producto" });
+    res.status(400).json({ error: error.message || "Error al editar producto" });
   }
 });
 
@@ -94,6 +153,18 @@ router.put("/:id", upload.single("imagen"), async (req: Request, res: Response) 
 router.patch("/bloquear/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
+    const productoExistente = await prisma.producto.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!productoExistente) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    if (productoExistente.bloqueado) {
+      return res.status(400).json({ error: "El producto ya está bloqueado" });
+    }
+
     const producto = await prisma.producto.update({
       where: { id: parseInt(id) },
       data: { bloqueado: true },
@@ -101,7 +172,34 @@ router.patch("/bloquear/:id", async (req: Request, res: Response) => {
     res.json(producto);
   } catch (error: any) {
     console.error(error);
-    res.status(400).json({ error: "Error al bloquear producto" });
+    res.status(400).json({ error: error.message || "Error al bloquear producto" });
+  }
+});
+
+// Desbloquear producto
+router.patch("/desbloquear/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const productoExistente = await prisma.producto.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!productoExistente) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    if (!productoExistente.bloqueado) {
+      return res.status(400).json({ error: "El producto no está bloqueado" });
+    }
+
+    const producto = await prisma.producto.update({
+      where: { id: parseInt(id) },
+      data: { bloqueado: false },
+    });
+    res.json(producto);
+  } catch (error: any) {
+    console.error(error);
+    res.status(400).json({ error: error.message || "Error al desbloquear producto" });
   }
 });
 

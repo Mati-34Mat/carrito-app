@@ -1,38 +1,71 @@
 import { useState, useEffect } from "react";
 import AddForm from "./components/AddForm";
 import ProductList from "./components/ProductList";
+import BlockedProducts from "./components/BlockedProducts";
 import { Producto } from "./types/Product.ts";
 
-type ActiveComponent = "list" | "add";
+type ActiveComponent = "list" | "add" | "blocked";
 const API_HOST = import.meta.env.VITE_API_HOST;
 const API_PORT = import.meta.env.VITE_API_PORT;
 
 function App() {
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [productosBloqueados, setProductosBloqueados] = useState<Producto[]>([]);
   const [activeComponent, setActiveComponent] = useState<ActiveComponent>("list");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [error, setError] = useState<string>("");
 
   const fetchProductos = async () => {
     try {
+      setError("");
       const res = await fetch(`http://${API_HOST}:${API_PORT}/products`);
       if (!res.ok) throw new Error("Error al obtener productos");
       const data: Producto[] = await res.json();
       setProductos(data);
     } catch (err) {
-      console.error("Error al obtener productos", err);
+      setError(err instanceof Error ? err.message : "Error al cargar productos");
+      setTimeout(() => setError(""), 5000);
+    }
+  };
+
+  const fetchProductosBloqueados = async () => {
+    try {
+      setError("");
+      const res = await fetch(`http://${API_HOST}:${API_PORT}/products/bloqueados`);
+      if (!res.ok) throw new Error("Error al obtener productos bloqueados");
+      const data: Producto[] = await res.json();
+      setProductosBloqueados(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al cargar productos bloqueados");
+      setTimeout(() => setError(""), 5000);
     }
   };
 
   useEffect(() => {
     fetchProductos();
+    fetchProductosBloqueados();
   }, []);
+
+  const handleRefresh = () => {
+    fetchProductos();
+    fetchProductosBloqueados();
+  };
 
   const renderActiveComponent = () => {
     switch (activeComponent) {
       case "add":
         return (
           <div className="mt-12 flex justify-center">
-            <AddForm onSuccess={fetchProductos} />
+            <AddForm onSuccess={handleRefresh} />
+          </div>
+        );
+      case "blocked":
+        return (
+          <div className="mt-6">
+            <BlockedProducts
+              productos={productosBloqueados}
+              onRefresh={handleRefresh}
+            />
           </div>
         );
       case "list":
@@ -41,7 +74,7 @@ function App() {
           <div className="mt-6">
             <ProductList
               productos={productos}
-              onRefresh={fetchProductos}
+              onRefresh={handleRefresh}
             />
           </div>
         );
@@ -64,20 +97,33 @@ function App() {
         <div className="w-10" />
       </header>
 
+      {/* Mensaje de error global */}
+      {error && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-pulse">
+          {error}
+        </div>
+      )}
+
       {/* Sidebar */}
       <aside
-				className={`bg-blue-950 shadow-lg fixed top-20 left-0 h-[calc(100vh-5rem)] transition-all duration-300 z-10 ${
-					isSidebarOpen ? "w-64 p-4" : "w-16 p-2"
-				}`}
-			>
+        className={`bg-blue-950 shadow-lg fixed top-20 left-0 h-[calc(100vh-5rem)] transition-all duration-300 z-10 ${
+          isSidebarOpen ? "w-64 p-4" : "w-16 p-2"
+        }`}
+      >
         <nav className="space-y-4">
           {[
             { key: "list", label: "Ver Productos", icon: "☰" },
             { key: "add", label: "Agregar Producto", icon: "✚" },
+            { key: "blocked", label: "Productos Bloqueados", icon: "🔒" },
           ].map((btn) => (
             <button
               key={btn.key}
-              onClick={() => setActiveComponent(btn.key as ActiveComponent)}
+              onClick={() => {
+                setActiveComponent(btn.key as ActiveComponent);
+                if (btn.key === "blocked") {
+                  fetchProductosBloqueados();
+                }
+              }}
               className={`w-full px-4 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center ${
                 isSidebarOpen ? "justify-start" : "justify-center"
               } ${
