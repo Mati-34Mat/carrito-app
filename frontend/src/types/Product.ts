@@ -1,4 +1,4 @@
-interface Producto {
+export interface Producto {
   id: number;
   codigo: string;
   nombre: string;
@@ -7,6 +7,5 @@ interface Producto {
   stock: number;
   categoria: string;
   imagenes?: string;
+  bloqueado: boolean;
 }
-
-export { Producto };
